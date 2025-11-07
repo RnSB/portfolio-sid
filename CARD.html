@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carte de Visite - SID AHMED BELKADI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #00d4ff;
+            --secondary: #0099ff;
+            --accent: #00aaff;
+            --dark: #0a0a0f;
+            --darker: #050508;
+            --light: #f0f0ff;
+            --gray: #a0a0b0;
+            --glass: rgba(10, 15, 30, 0.25);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--darker);
+            color: var(--light);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        /* Background animé */
+        .bg-canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            z-index: -1;
+        }
+
+        /* Conteneur principal */
+        .card-container {
+            width: 350px;
+            height: 550px;
+            position: relative;
+            overflow: hidden;
+            border-radius: 25px;
+            box-shadow: 0 25px 50px rgba(0, 212, 255, 0.25);
+        }
+
+        /* Carte avec slide horizontal */
+        .card-slider {
+            display: flex;
+            width: 200%;
+            height: 100%;
+            transition: transform 0.6s cubic-bezier(0.22, 0.61, 0.36, 1);
+        }
+
+        .card-slider.slid {
+            transform: translateX(-50%);
+        }
+
+        /* Faces */
+        .card-face {
+            width: 50%;
+            height: 100%;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .card-front {
+            background: var(--glass);
+        }
+
+        .card-back {
+            background: var(--glass);
+        }
+
+        /* En-tête */
+        .card-header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-header h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.02em;
+            text-shadow: 0 0 30px rgba(0, 212, 255, 0.2);
+        }
+
+        .card-header .title {
+            font-size: 0.8rem;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-weight: 500;
+        }
+
+        .badges-mini {
+            display: flex;
+            gap: 0.4rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 1rem 0;
+        }
+
+        .badge-mini {
+            background: rgba(0, 212, 255, 0.1);
+            padding: 0.25rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.6rem;
+            color: var(--primary);
+            font-weight: 600;
+            border: 1px solid rgba(0, 212, 255, 0.3);
+        }
+
+        /* Corps */
+        .card-body {
+            flex: 1;
+        }
+
+        .info-row {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            margin-bottom: 1rem;
+            padding: 0.7rem;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .info-row:hover {
+            background: rgba(0, 212, 255, 0.1);
+            transform: translateX(5px);
+        }
+
+        .info-row i {
+            color: var(--primary);
+            font-size: 1.1rem;
+            width: 20px;
+        }
+
+        .info-row .label {
+            font-size: 0.7rem;
+            color: var(--gray);
+            display: block;
+        }
+
+        .info-row .value {
+            font-size: 0.85rem;
+            color: var(--light);
+            font-weight: 500;
+        }
+
+        /* QR Code vers le portfolio - VERSION CORRIGÉE */
+        .qr-section {
+            text-align: center;
+            margin: 1rem 0;
+            padding-top: 0.5rem;
+        }
+
+        .qr-code-card {
+            width: 90px;
+            height: 90px;
+            margin: 0 auto;
+            background: white;
+            padding: 8px;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .qr-code-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+        }
+
+        .qr-code-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .qr-label {
+            font-size: 0.75rem;
+            color: var(--gray);
+            margin-top: 0.4rem;
+        }
+
+        .qr-value {
+            font-size: 0.65rem;
+            color: var(--primary);
+            font-weight: 600;
+            word-break: break-all;
+            max-width: 100%;
+            display: inline-block;
+        }
+
+        /* Face arrière */
+        .back-content h2 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.4rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .back-content p {
+            font-size: 0.85rem;
+            color: var(--gray);
+            text-align: center;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .skills-mini {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.4rem;
+            width: 100%;
+            margin-bottom: 1.5rem;
+        }
+
+        .skill-mini {
+            background: rgba(0, 212, 255, 0.1);
+            padding: 0.4rem;
+            border-radius: 10px;
+            font-size: 0.6rem;
+            text-align: center;
+            color: var(--light);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+        }
+
+        /* Bouton de contrôle */
+        .controls {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            z-index: 10;
+        }
+
+        .slide-btn {
+            background: var(--primary);
+            color: var(--dark);
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 212, 255, 0.3);
+        }
+
+        .slide-btn:hover {
+            background: var(--accent);
+            transform: scale(1.05);
+        }
+
+        /* Instructions */
+        .instructions {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: var(--gray);
+            font-size: 0.9rem;
+            text-align: center;
+            z-index: 10;
+        }
+
+        /* Version imprimable */
+        @media print {
+            body {
+                background: white !important;
+            }
+            .bg-canvas, .instructions, .controls {
+                display: none !important;
+            }
+            .card-container {
+                box-shadow: none !important;
+                page-break-inside: avoid;
+            }
+            .card-face {
+                box-shadow: none !important;
+                border: 1px solid #ccc !important;
+            }
+            .card-slider {
+                transform: translateX(0) !important;
+            }
+            .card-slider.slid {
+                transform: translateX(-50%) !important;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 400px) {
+            .card-container {
+                width: 300px;
+                height: 470px;
+            }
+            
+            .card-face {
+                padding: 1.5rem;
+            }
+            
+            .qr-code-card {
+                width: 80px;
+                height: 80px;
+            }
+            
+            .card-header h1 {
+                font-size: 1.4rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Background animé -->
+    <canvas class="bg-canvas" id="bgCanvas"></canvas>
+
+    <!-- Instructions -->
+    <div class="instructions">
+        <p>🖱️ Passe ta souris sur la carte pour glisser entre les vues</p>
+        <p>📱 Sur mobile, glisse horizontalement ou utilise les boutons</p>
+    </div>
+
+    <!-- Carte de visite avec slide -->
+    <div class="card-container" id="cardContainer">
+        <div class="card-slider" id="cardSlider">
+            <!-- Face avant -->
+            <div class="card-face card-front">
+                <div>
+                    <div class="card-header">
+                        <h1>SID AHMED BELKADI</h1>
+                        <div class="title">Expert IT 360° | Consultant International</div>
+                        <div class="badges-mini">
+                            <div class="badge-mini">ODOO</div>
+                            <div class="badge-mini">NUTANIX</div>
+                            <div class="badge-mini">HUAWEI</div>
+                        </div>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="info-row">
+                            <i class="fas fa-envelope"></i>
+                            <div>
+                                <span class="label">Email</span>
+                                <span class="value">sidahblk3143@gmail.com</span>
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <i class="fas fa-phone"></i>
+                            <div>
+                                <span class="label">Téléphone</span>
+                                <span class="value">+213 6 58 64 12 63</span>
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <div>
+                                <span class="label">Localisation</span>
+                                <span class="value">Algérie - International</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="qr-section">
+                    <div class="qr-code-card" onclick="window.open(PORTFOLIO_URL, '_blank')">
+                        <!-- Le QR code sera généré ici -->
+                        <img id="qrImage" src="" alt="QR Portfolio" style="width: 100%; height: 100%;">
+                    </div>
+                    <div class="qr-label">Portfolio Professionnel</div>
+                    <div class="qr-value" id="qrText"></div>
+                </div>
+            </div>
+
+            <!-- Face arrière -->
+            <div class="card-face card-back">
+                <div class="back-content">
+                    <h2>Expertise 360°</h2>
+                    <p>Transformation digitale complète, formation & solutions enterprise certifiées</p>
+                    
+                    <div class="skills-mini">
+                        <div class="skill-mini">Dev Full-Stack</div>
+                        <div class="skill-mini">IA & LLM</div>
+                        <div class="skill-mini">ERP Odoo</div>
+                        <div class="skill-mini">Data Center</div>
+                        <div class="skill-mini">Cybersécurité</div>
+                        <div class="skill-mini">BI & Analytics</div>
+                        <div class="skill-mini">Cloud</div>
+                        <div class="skill-mini">DevOps</div>
+                        <div class="skill-mini">Consulting</div>
+                    </div>
+
+                    <div style="font-size: 0.8rem; color: var(--gray); text-align: center; line-height: 1.5;">
+                        <strong>Plus de 10 ans d'expérience</strong><br>
+                        Formateur de 500+ professionnels<br>
+                        Partenaire enterprise certifié
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Boutons de contrôle -->
+    <div class="controls">
+        <button class="slide-btn" onclick="slideCard()">
+            <i class="fas fa-arrows-alt-h"></i> Glisser
+        </button>
+    </div>
+
+    <script>
+        // ==================== PERSONNALISATION FACILE ====================
+        // MODIFIEZ UNIQUEMENT CETTE LIGNE avec votre URL complète
+        const PORTFOLIO_URL = "https://rn-sb.github.io/portfolio-sid/";
+        // ===================================================================
+        
+        // ====== BACKGROUND PARTICLES ======
+        const bgCanvas = document.getElementById('bgCanvas');
+        const ctx = bgCanvas.getContext('2d');
+        let bgParticles;
+
+        bgCanvas.width = window.innerWidth;
+        bgCanvas.height = window.innerHeight;
+
+        class BgParticle {
+            constructor() {
+                this.x = Math.random() * bgCanvas.width;
+                this.y = Math.random() * bgCanvas.height;
+                this.size = Math.random() * 1.5 + 0.5;
+                this.speedX = Math.random() * 0.4 - 0.2;
+                this.speedY = Math.random() * 0.4 - 0.2;
+                this.opacity = Math.random() * 0.4 + 0.2;
+            }
+
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.x > bgCanvas.width) this.x = 0;
+                if (this.x < 0) this.x = bgCanvas.width;
+                if (this.y > bgCanvas.height) this.y = 0;
+                if (this.y < 0) this.y = bgCanvas.height;
+            }
+
+            draw() {
+                ctx.fillStyle = `rgba(0, 212, 255, ${this.opacity})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function initBgParticles() {
+            bgParticles = [];
+            for (let i = 0; i < 60; i++) {
+                bgParticles.push(new BgParticle());
+            }
+        }
+
+        function animateBg() {
+            ctx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
+            for (let i = 0; i < bgParticles.length; i++) {
+                bgParticles[i].update();
+                bgParticles[i].draw();
+            }
+            requestAnimationFrame(animateBg);
+        }
+
+        initBgParticles();
+        animateBg();
+
+        window.addEventListener('resize', () => {
+            bgCanvas.width = window.innerWidth;
+            bgCanvas.height = window.innerHeight;
+            initBgParticles();
+        });
+
+        // ====== MISE À JOUR DU QR CODE ======
+        function updateQRCode() {
+            const qrImage = document.getElementById('qrImage');
+            const qrText = document.getElementById('qrText');
+            const cleanUrl = PORTFOLIO_URL.replace(/^https?:\/\//, '');
+            
+            qrImage.src = `https://api.qrserver.com/v1/create-qr-code/?size=90x90&data=${encodeURIComponent(PORTFOLIO_URL)}`;
+            qrText.textContent = cleanUrl;
+        }
+
+        // ====== CARD SLIDE ======
+        const cardSlider = document.getElementById('cardSlider');
+        const cardContainer = document.getElementById('cardContainer');
+        let isSlid = false;
+
+        function slideCard() {
+            isSlid = !isSlid;
+            cardSlider.classList.toggle('slid', isSlid);
+        }
+
+        // Auto-slide au survol
+        cardContainer.addEventListener('mouseenter', () => {
+            if (!isSlid) slideCard();
+        });
+
+        cardContainer.addEventListener('mouseleave', () => {
+            if (isSlid) slideCard();
+        });
+
+        // Slide avec clic/touche (mobile)
+        cardContainer.addEventListener('click', slideCard);
+
+        // Slide avec swipe mobile
+        let startX = 0;
+        let currentX = 0;
+
+        cardContainer.addEventListener('touchstart', (e) => {
+            startX = e.touches[0].clientX;
+        });
+
+        cardContainer.addEventListener('touchend', (e) => {
+            currentX = e.changedTouches[0].clientX;
+            const diffX = startX - currentX;
+            
+            if (Math.abs(diffX) > 50) {
+                if (diffX > 0 && !isSlid) {
+                    slideCard(); // Swipe gauche
+                } else if (diffX < 0 && isSlid) {
+                    slideCard(); // Swipe droit
+                }
+            }
+        });
+
+        // Initialisation
+        updateQRCode();
+    </script>
+</body>
+</html>
